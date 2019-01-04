@@ -41,12 +41,17 @@
 #include "stm32f1xx_hal.h"
 #include "rtc.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include <stdlib.h> // rand
+	#include <string.h>
 	#include "cipherglot17_sm.h"
 	// TIM2 Sound on port PA1
 	// TIM3 timer LED Off = 2 sec
+	// TIM4 prompt current cipher
+	// UART3 -> PB10 for DEBUG, speed = 38400;
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -67,6 +72,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 #define END_NUMBER 995
+volatile uint32_t current_cipher_u32 = 0 ;
 
 /* USER CODE END 0 */
 
@@ -111,6 +117,7 @@ int main(void)
 	uint32_t StopMinutes    = 0 ;
 	uint32_t StopHours      = 0 ;
 	uint32_t TypeOfGame		= 3 ; // Pi or Old
+	char DataChar[100];
 
   /* USER CODE END 1 */
 
@@ -135,35 +142,41 @@ int main(void)
   MX_RTC_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-
+  MX_TIM4_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-	   HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
-	   // Test_Segment();
-	   TypeOfGame = TestLED();
+	HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
+	HAL_TIM_Base_Start_IT(&htim4); // start TIM4 prompt
 
-	   if (TypeOfGame == 3)
-	   {
-		  Start_Number = 0;
-	   }
+	sprintf(DataChar,"\r\n\r\nUART3 for debug Start\r\nSpeed 38400\r\n");
+	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
 
-	   else
-	   {
-		  Start_Number = 5 ;
-		  do
-		  {
-			  Cipher[1] = rand()%10; // 0..9
-			  Cipher[2] = rand()%10;
-			  Cipher[3] = rand()%10;
-			  Cipher[4] = rand()%6 + 10; // A .. F
+	// Test_Segment();
+	TypeOfGame = TestLED();
 
-		  }
-		  while (	(Cipher[1] == Cipher[2])
-				 ||	(Cipher[2] == Cipher[3])
-				 ||	(Cipher[3] == Cipher[1])  );
-	   } // end if
+   if (TypeOfGame == 3)
+   {
+	  Start_Number = 0;
+   }
+   else
+   {
+	  Start_Number = 5 ;
+	  do
+	  {
+		  Cipher[1] = rand()%10; // 0..9
+		  Cipher[2] = rand()%10;
+		  Cipher[3] = rand()%10;
+		  Cipher[4] = rand()%6 + 10; // A .. F
+	  }
+	  while (	(Cipher[1] == Cipher[2])
+			 ||	(Cipher[2] == Cipher[3])
+			 ||	(Cipher[3] == Cipher[1])  );
+   } // end if
 
-	   Total_Number   = Start_Number ;
-	   Current_Number = Start_Number ;
+   Total_Number   = Start_Number ;
+   Current_Number = Start_Number ;
+	sprintf(DataChar,"Init - Ok\r\n");
+	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -233,11 +246,14 @@ int main(void)
 
 	do  // Komp
 	{
+		current_cipher_u32 = Cipher[Current_Number];
 		if ( KeyPressed() == Cipher[Current_Number])
 		{
 			Error = 0;
 			Cipher_OK();
 			Current_Number++;
+			TIM4->CNT = 0;
+			Set_Prompt_Status(0);
 		}
 		else
 		{
@@ -251,14 +267,20 @@ int main(void)
 			}
 		} // do Komp
 	while ((Current_Number <= Total_Number ) && ( Error == 0 ));
-	 	if ( Error == 0 ) Total_Number++;
-	 	if (Total_Number >= END_NUMBER)
-	 		TheEnd();
+
+	if ( Error == 0 ) Total_Number++;
+
+	if (Total_Number >= END_NUMBER)
+	{
+		TheEnd();
+	}
 
   /* USER CODE END WHILE */
+
   /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+
 }
 
 /**

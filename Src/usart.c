@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : TIM.h
+  * File Name          : USART.c
   * Description        : This file provides code for the configuration
-  *                      of the TIM instances.
+  *                      of the USART instances.
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -36,45 +36,89 @@
   *
   ******************************************************************************
   */
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __tim_H
-#define __tim_H
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include "main.h"
+#include "usart.h"
 
-/* USER CODE BEGIN Includes */
+#include "gpio.h"
 
-/* USER CODE END Includes */
+/* USER CODE BEGIN 0 */
 
-extern TIM_HandleTypeDef htim2;
-extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim4;
+/* USER CODE END 0 */
 
-/* USER CODE BEGIN Private defines */
+UART_HandleTypeDef huart3;
 
-/* USER CODE END Private defines */
+/* USART3 init function */
 
-extern void _Error_Handler(char *, int);
+void MX_USART3_UART_Init(void)
+{
 
-void MX_TIM2_Init(void);
-void MX_TIM3_Init(void);
-void MX_TIM4_Init(void);
-                        
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-                    
-/* USER CODE BEGIN Prototypes */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 38400;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_HalfDuplex_Init(&huart3) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-/* USER CODE END Prototypes */
-
-#ifdef __cplusplus
 }
-#endif
-#endif /*__ tim_H */
+
+void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if(uartHandle->Instance==USART3)
+  {
+  /* USER CODE BEGIN USART3_MspInit 0 */
+
+  /* USER CODE END USART3_MspInit 0 */
+    /* USART3 clock enable */
+    __HAL_RCC_USART3_CLK_ENABLE();
+  
+    /**USART3 GPIO Configuration    
+    PB10     ------> USART3_TX 
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN USART3_MspInit 1 */
+
+  /* USER CODE END USART3_MspInit 1 */
+  }
+}
+
+void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
+{
+
+  if(uartHandle->Instance==USART3)
+  {
+  /* USER CODE BEGIN USART3_MspDeInit 0 */
+
+  /* USER CODE END USART3_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_USART3_CLK_DISABLE();
+  
+    /**USART3 GPIO Configuration    
+    PB10     ------> USART3_TX 
+    */
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10);
+
+  /* USER CODE BEGIN USART3_MspDeInit 1 */
+
+  /* USER CODE END USART3_MspDeInit 1 */
+  }
+} 
+
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
 
 /**
   * @}

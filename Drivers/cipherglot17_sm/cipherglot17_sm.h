@@ -38,5 +38,7 @@ void Cipher_Error(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
 uint32_t ScanKeyBoard(void);
 uint32_t KeyPressed(void);
 uint32_t TestLED(void);
+uint8_t Prompt_Status (void);
+void Set_Prompt_Status(uint8_t new_prompt_u8);
 
 #endif
