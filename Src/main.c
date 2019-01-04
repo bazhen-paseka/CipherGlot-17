@@ -41,12 +41,17 @@
 #include "stm32f1xx_hal.h"
 #include "rtc.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include <stdlib.h> // rand
+	#include <string.h>
 	#include "cipherglot17_sm.h"
 	// TIM2 Sound on port PA1
 	// TIM3 timer LED Off = 2 sec
+	// TIM4 prompt current cipher
+	// UART3 -> PB10 for DEBUG, speed = 38400;
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -67,6 +72,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 #define END_NUMBER 995
+volatile uint32_t current_cipher_u32 = 0 ;
 
 /* USER CODE END 0 */
 
@@ -78,12 +84,11 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	/* USER CODE BEGIN 1 */
-		uint32_t Cipher[END_NUMBER] = {3,
-	1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3,2,7,9,5,0,2,8,8,4,1,9,7,1,6,9,3,9,9,3,7,5,1,0,
-	5,8,2,0,9,7,4,9,4,4,5,9,2,3,0,7,8,1,6,4,0,6,2,8,6,2,0,8,9,9,8,6,2,8,0,3,4,8,2,5,3,4,2,1,1,7,0,6,7,9,
-	8,2,1,4,8,0,8,6,5,1,3,2,8,2,3,0,6,6,4,7,0,9,3,8,4,4,6,0,9,5,5,0,5,8,2,2,3,1,7,2,5,3,5,9,4,0,8,1,2,8,
-	4,8,1,1,1,7,4,5,0,2,8,4,1,0,2,7,0,1,9,3,8,5,2,1,1,0,5,5,5,9,6,4,4,6,2,2,9,4,8,9,5,4,9,3,0,3,8,1,9,6
+	uint32_t Cipher[END_NUMBER] = {3,
+		1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3,2,7,9,5,0,2,8,8,4,1,9,7,1,6,9,3,9,9,3,7,5,1,0,
+		5,8,2,0,9,7,4,9,4,4,5,9,2,3,0,7,8,1,6,4,0,6,2,8,6,2,0,8,9,9,8,6,2,8,0,3,4,8,2,5,3,4,2,1,1,7,0,6,7,9,
+		8,2,1,4,8,0,8,6,5,1,3,2,8,2,3,0,6,6,4,7,0,9,3,8,4,4,6,0,9,5,5,0,5,8,2,2,3,1,7,2,5,3,5,9,4,0,8,1,2,8,
+		4,8,1,1,1,7,4,5,0,2,8,4,1,0,2,7,0,1,9,3,8,5,2,1,1,0,5,5,5,9,6,4,4,6,2,2,9,4,8,9,5,4,9,3,0,3,8,1,9,6
 		//		  44288 10975 66593 34461 28475  64823 37867 83165 27120 19091
 		//		  45648 56692 34603 48610 45432  66482 13393 60726 02491 41273
 		//		  72458 70066 06315 58817 48815  20920 96282 92540 91715 36436
@@ -101,17 +106,18 @@ int main(void)
 		//		  59825 34904 28755 46873 11595  62863 88235 37875 93751 95778
 		//		  18577 80532 17122 68066 13001  92787 66111 95909 21642 01989
 	};
-		//uint32_t Cipher[END_NUMBER];
-		uint32_t Error          = 0 ;
-		uint32_t Start_Number   = 0 ;
-		uint32_t Start_Numb[3]  = {0,0,0} ;
-		uint32_t Total_Number   = 0 ;
-		uint32_t Current_Number = 0 ;
-		RTC_TimeTypeDef TimeStruct  ;
-		uint32_t StopSeconds    = 0 ;
-		uint32_t StopMinutes    = 0 ;
-		uint32_t StopHours      = 0 ;
-		uint32_t TypeOfGame		= 3 ; // Pi or Old
+
+	uint32_t Error          = 0 ;
+	uint32_t Start_Number   = 0 ;
+	uint32_t Start_Numb[3]  = {0,0,0} ;
+	uint32_t Total_Number   = 0 ;
+	uint32_t Current_Number = 0 ;
+	RTC_TimeTypeDef TimeStruct  ;
+	uint32_t StopSeconds    = 0 ;
+	uint32_t StopMinutes    = 0 ;
+	uint32_t StopHours      = 0 ;
+	uint32_t TypeOfGame		= 3 ; // Pi or Old
+	char DataChar[100];
 
   /* USER CODE END 1 */
 
@@ -136,133 +142,145 @@ int main(void)
   MX_RTC_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  /* USER CODE BEGIN 2 */
+	HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
+	HAL_TIM_Base_Start_IT(&htim4); // start TIM4 prompt
 
-   HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
-   // Test_Segment();
-   TypeOfGame = TestLED();
+	sprintf(DataChar,"\r\n\r\nUART3 for debug Start\r\nSpeed 38400\r\n");
+	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	// Test_Segment();
+	TypeOfGame = TestLED();
 
    if (TypeOfGame == 3)
    {
- 	  Start_Number = 0;
+	  Start_Number = 0;
    }
-
    else
    {
- 	  Start_Number = 5 ;
- 	  do
- 	  {
- 		  Cipher[1] = rand()%10; // 0..9
- 		  Cipher[2] = rand()%10;
- 		  Cipher[3] = rand()%10;
- 		  Cipher[4] = rand()%6 + 10; // A .. F
-
- 	  }
- 	  while (	(Cipher[1] == Cipher[2])
- 			 ||	(Cipher[2] == Cipher[3])
+	  Start_Number = 5 ;
+	  do
+	  {
+		  Cipher[1] = rand()%10; // 0..9
+		  Cipher[2] = rand()%10;
+		  Cipher[3] = rand()%10;
+		  Cipher[4] = rand()%6 + 10; // A .. F
+	  }
+	  while (	(Cipher[1] == Cipher[2])
+			 ||	(Cipher[2] == Cipher[3])
 			 ||	(Cipher[3] == Cipher[1])  );
    } // end if
 
    Total_Number   = Start_Number ;
    Current_Number = Start_Number ;
-
+	sprintf(DataChar,"Init - Ok\r\n");
+	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
- 		if (Total_Number == Start_Number)
-	 		{
-	 			TimeStruct.Hours   = 0;
-	 			TimeStruct.Minutes = 0;
-	 			TimeStruct.Seconds = 0;
-	 			HAL_RTC_SetTime( &hrtc, &TimeStruct, RTC_FORMAT_BIN );
-	 		}
+	if (Total_Number == Start_Number)
+		{
+			TimeStruct.Hours   = 0;
+			TimeStruct.Minutes = 0;
+			TimeStruct.Seconds = 0;
+			HAL_RTC_SetTime( &hrtc, &TimeStruct, RTC_FORMAT_BIN );
+		}
 
+	if (TypeOfGame != 3)
+	{
+		if ( Total_Number %4 == 0 )
+		{
+			do
+			{
+				Cipher[Total_Number] = rand()%6 + 10; // A .. F
+			}
+			while ( (Cipher[Total_Number] == Cipher[Total_Number - 4]) );
+		}
+		else
+		{
+			do
+			{
+				Cipher[Total_Number] = rand()%10; // 0x00 .. 0x0F
+			}
+			while ( (Cipher[Total_Number] == Cipher[Total_Number - 1]) ||
+					(Cipher[Total_Number] == Cipher[Total_Number - 2]) ||
+					(Cipher[Total_Number] == Cipher[Total_Number - 3]) ||
+					(Cipher[Total_Number] == Cipher[Total_Number - 4])  );
+		}
+	}	//	end if (TypeOfGame != 3)
 
-	 	if (TypeOfGame != 3)
-	 	{
-	 		if ( Total_Number %4 == 0 )
-	 		{
-	 			do
-	 			{
-	 				Cipher[Total_Number] = rand()%6 + 10; // A .. F
-	 			}
-	 			while ( (Cipher[Total_Number] == Cipher[Total_Number - 4]) );
-	 		}
-	 		else
-	 		{
-	 			do
-	 			{
-	 				Cipher[Total_Number] = rand()%10; // 0x00 .. 0x0F
-	 			}
-	 			while ( (Cipher[Total_Number] == Cipher[Total_Number - 1]) ||
-	 					(Cipher[Total_Number] == Cipher[Total_Number - 2]) ||
-	 					(Cipher[Total_Number] == Cipher[Total_Number - 3]) ||
-	 					(Cipher[Total_Number] == Cipher[Total_Number - 4])  );
-	 		}
-	 	}	//	end if (TypeOfGame != 3)
+	if ((TypeOfGame == 3) && (Total_Number == Start_Number))
+	{
+		Beeper(1);
+		CipherPrint(0x11);
+		Segment_A(1);
+		Start_Numb[0] = KeyPressed();
+		Beeper(2);
+		CipherPrint(Start_Numb[0]);
+		HAL_Delay(500);
 
-	 	if ((TypeOfGame == 3) && (Total_Number == Start_Number))
-	 	{
-	 		Beeper(1);
-	 		CipherPrint(0x11);
-	 		Segment_A(1);
-	 		Start_Numb[0] = KeyPressed();
-	 		Beeper(2);
-	 		CipherPrint(Start_Numb[0]);
-	 		HAL_Delay(500);
+		CipherPrint(0x11);
+		Segment_G(1);
+		Start_Numb[1] = KeyPressed();
+		Beeper(2);
+		CipherPrint(Start_Numb[1]);
+		HAL_Delay(500);
 
-	 		CipherPrint(0x11);
-	 		Segment_G(1);
-	 		Start_Numb[1] = KeyPressed();
-	 		Beeper(2);
-	 		CipherPrint(Start_Numb[1]);
-	 		HAL_Delay(500);
+		CipherPrint(0x11);
+		Segment_D(1);
+		Start_Numb[2] = KeyPressed();
+		Beeper(2);
+		CipherPrint(Start_Numb[2]);
+		HAL_Delay(300);
+		Total_Number = 100*Start_Numb[0] + 10*Start_Numb[1] + Start_Numb[2];
+	}
 
-	 		CipherPrint(0x11);
-	 		Segment_D(1);
-	 		Start_Numb[2] = KeyPressed();
-	 		Beeper(2);
-	 		CipherPrint(Start_Numb[2]);
-	 		HAL_Delay(300);
-	 		Total_Number = 100*Start_Numb[0] + 10*Start_Numb[1] + Start_Numb[2];
-	 	}
+	Beeper(2);
+	CipherPrint(Cipher[Total_Number]);
+	Current_Number = Start_Number ;
 
-	 	Beeper(2);
-	 	CipherPrint(Cipher[Total_Number]);
-	 	Current_Number = Start_Number ;
+	do  // Komp
+	{
+		current_cipher_u32 = Cipher[Current_Number];
+		if ( KeyPressed() == Cipher[Current_Number])
+		{
+			Error = 0;
+			Cipher_OK();
+			Current_Number++;
+			TIM4->CNT = 0;
+			Set_Prompt_Status(0);
+		}
+		else
+		{
+			Error = 1;
+			HAL_RTC_GetTime( &hrtc, &TimeStruct, RTC_FORMAT_BIN );
+			StopSeconds = TimeStruct.Seconds ;
+			StopMinutes = TimeStruct.Minutes ;
+			StopHours   = TimeStruct.Hours ;
+			Cipher_Error(Start_Number,Current_Number,Total_Number, StopHours, StopMinutes, StopSeconds );
+			Total_Number = Start_Number;
+			}
+		} // do Komp
+	while ((Current_Number <= Total_Number ) && ( Error == 0 ));
 
-	 	do  // Komp
-	 	{
-	 		if ( KeyPressed() == Cipher[Current_Number])
-	 		{
-	 			Error = 0;
-	 			Cipher_OK();
-	 			Current_Number++;
-	 		}
-	 		else
-	 		{
-	 			Error = 1;
-	 			HAL_RTC_GetTime( &hrtc, &TimeStruct, RTC_FORMAT_BIN );
-	 			StopSeconds = TimeStruct.Seconds ;
-	 			StopMinutes = TimeStruct.Minutes ;
-	 			StopHours   = TimeStruct.Hours ;
-	 			Cipher_Error(Start_Number,Current_Number,Total_Number, StopHours, StopMinutes, StopSeconds );
-	 			Total_Number = Start_Number;
-	 			}
-	 		} // do Komp
-	 	while ((Current_Number <= Total_Number ) && ( Error == 0 ));
-	 	if ( Error == 0 ) Total_Number++;
-	 	if (Total_Number >= END_NUMBER)
-	 		TheEnd();
+	if ( Error == 0 ) Total_Number++;
+
+	if (Total_Number >= END_NUMBER)
+	{
+		TheEnd();
+	}
 
   /* USER CODE END WHILE */
+
   /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+
 }
 
 /**
