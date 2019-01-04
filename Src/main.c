@@ -59,7 +59,6 @@
 // TIM3 timer LED Off = 2 sec
 
 /* USER CODE END Includes */
-/* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -73,11 +72,6 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
-/* USER CODE BEGIN 0 */
 
 uint32_t ScanKeyBoard(void);
 uint32_t KeyPressed(void);
@@ -100,10 +94,15 @@ void Cipher_Error(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
 void Beeper(uint32_t);
 void TheEnd(void);
 
+void Test_Segment(void);
+
+/* USER CODE END PFP */
+
+/* USER CODE BEGIN 0 */
+
 #define END_NUMBER 995
 volatile uint32_t Blank = 0 ;
 
-/* USER CODE END 0 */
 /* USER CODE END 0 */
 
 /**
@@ -149,8 +148,6 @@ int main(void)
 		uint32_t StopHours      = 0 ;
 		uint32_t TypeOfGame		= 3 ; // Pi or Old
 
-	  /* USER CODE END 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -179,6 +176,7 @@ int main(void)
 
    HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
 
+   Test_Segment();
 
    TypeOfGame = TestLED();
 
@@ -206,7 +204,6 @@ int main(void)
    Total_Number   = Start_Number ;
    Current_Number = Start_Number ;
 
-   /* USER CODE END 2 */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -302,7 +299,6 @@ int main(void)
 	 	if (Total_Number >= END_NUMBER)
 	 		TheEnd();
 
-	   /* USER CODE END WHILE */
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -864,8 +860,8 @@ void Segment_A(uint32_t status)
 
 void Segment_B(uint32_t status)
 {
-	if (status == 0) HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13,   SET);
-	else         	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, RESET);
+	if (status == 0) HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4,   SET);
+	else         	 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, RESET);
 }
 
 void Segment_C(uint32_t status)
@@ -928,8 +924,51 @@ void ScanRow_E0FD(uint32_t status)
 	else			 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11,    SET);
 }
 
+void Test_Segment(void)
+{
+	Segment_A(0);
+	Segment_B(0);
+	Segment_C(0);
+	Segment_D(0);
+	Segment_P(0);
+	Segment_P(0);
+	Segment_G(0);
+	Segment_F(0);
+	Segment_E(0);
 
-/* USER CODE END 4 */
+	Segment_A(1);
+	HAL_Delay(500);
+	Segment_A(0);
+
+	Segment_B(1);
+	HAL_Delay(500);
+	Segment_B(0);
+
+	Segment_C(1);
+	HAL_Delay(500);
+	Segment_C(0);
+
+	Segment_D(1);
+	HAL_Delay(500);
+	Segment_D(0);
+
+	Segment_P(1);
+	HAL_Delay(500);
+	Segment_P(0);
+
+	Segment_G(1);
+	HAL_Delay(500);
+	Segment_G(0);
+
+	Segment_F(1);
+	HAL_Delay(500);
+	Segment_F(0);
+
+	Segment_E(1);
+	HAL_Delay(500);
+	Segment_E(0);
+}
+
 /* USER CODE END 4 */
 
 /**
