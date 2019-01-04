@@ -3,8 +3,13 @@
 #include <stdlib.h> // rand
 
 extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim4;
+extern UART_HandleTypeDef huart3;
 
 volatile uint32_t Blank = 0 ;
+volatile uint8_t prompt_u8 = 0 ;
+extern uint32_t current_cipher_u32;
+char DataChar_sm[100];
 
 void Segment_A(uint32_t status)
 {
@@ -446,6 +451,7 @@ uint32_t KeyPressed(void)
 {
 	uint32_t Key1;
 	uint32_t Key2;
+
 	do // KeyPresseed
 	{
 		Blank = 0;
@@ -455,6 +461,7 @@ uint32_t KeyPressed(void)
 		Key2 = ScanKeyBoard();
 	}
 	while (Key1 != Key2);
+
 	return Key1;
 }
 //**********************************************************************
@@ -462,13 +469,29 @@ uint32_t KeyPressed(void)
 uint32_t ScanKeyBoard(void)
 {
 	uint32_t key_board;
+
+	TIM4->CNT = 0;
+	Set_Prompt_Status(0);
+	HAL_TIM_Base_Start(&htim4);
+
 	do
+	{
+		if (Prompt_Status() == 1 )
 		{
+			sprintf(DataChar_sm,"prompt: %d\r\n", (int)current_cipher_u32);
+			HAL_UART_Transmit(&huart3, (uint8_t *)DataChar_sm, strlen(DataChar_sm), 100);
+			CipherPrint(current_cipher_u32);
+			HAL_Delay(200);
+			CipherPrint(0x11);
+			Set_Prompt_Status(0);
+			TIM4->CNT = 0;
+		}
+
 		if (Blank == 1)
-			{
+		{
 			CipherPrint(0x11) ; // blank
 			Blank = 0;
-			}
+		}
 		rand();
 		key_board=0xFF;
 
@@ -501,6 +524,9 @@ uint32_t ScanKeyBoard(void)
 		ScanRow_E0FD(0);
 		}
 	while (key_board == 0xFF);
+
+	HAL_TIM_Base_Stop(&htim4); // stop TIM4 prompt
+
 	return key_board;
 }
 //**********************************************************************
@@ -536,7 +562,6 @@ void TheEnd(void)
 }
 //**********************************************************************
 
-
 void Cipher_OK(void)
 {
 	Beeper(1);
@@ -544,6 +569,7 @@ void Cipher_OK(void)
 	HAL_Delay(200);
 	CipherPrint(0x11); // blank
 }
+//**********************************************************************
 
 void Cipher_Error(uint32_t StartNumb, uint32_t CurNumb, uint32_t MaxNumb, uint32_t StopHour, uint32_t StopMin, uint32_t StopSec)
 {
@@ -615,6 +641,17 @@ void Cipher_Error(uint32_t StartNumb, uint32_t CurNumb, uint32_t MaxNumb, uint32
 	KeyPressed();
 	Beeper(1);
 	HAL_Delay(1000);
-
 }
+//**********************************************************************
 
+uint8_t Prompt_Status(void)
+{
+	return prompt_u8;
+}
+//**********************************************************************
+
+void Set_Prompt_Status(uint8_t new_prompt_u8)
+{
+	prompt_u8 = new_prompt_u8;
+}
+//**********************************************************************
