@@ -176,7 +176,7 @@ int main(void)
 
    HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
 
-   Test_Segment();
+   // Test_Segment();
 
    TypeOfGame = TestLED();
 
@@ -854,14 +854,14 @@ void CipherPrint (uint32_t num)
 
 void Segment_A(uint32_t status)
 {
-	if (status == 0) HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1,   SET);
-	else             HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, RESET);
+	if (status == 0) HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4,   SET);
+	else             HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, RESET);
 }
 
 void Segment_B(uint32_t status)
 {
-	if (status == 0) HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4,   SET);
-	else         	 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, RESET);
+	if (status == 0) HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1,   SET);
+	else         	 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, RESET);
 }
 
 void Segment_C(uint32_t status)
@@ -929,9 +929,8 @@ void Test_Segment(void)
 	Segment_A(0);
 	Segment_B(0);
 	Segment_C(0);
+	Segment_P(0);
 	Segment_D(0);
-	Segment_P(0);
-	Segment_P(0);
 	Segment_G(0);
 	Segment_F(0);
 	Segment_E(0);
@@ -952,21 +951,21 @@ void Test_Segment(void)
 	HAL_Delay(500);
 	Segment_D(0);
 
-	Segment_P(1);
+	Segment_E(1);
 	HAL_Delay(500);
-	Segment_P(0);
-
-	Segment_G(1);
-	HAL_Delay(500);
-	Segment_G(0);
+	Segment_E(0);
 
 	Segment_F(1);
 	HAL_Delay(500);
 	Segment_F(0);
 
-	Segment_E(1);
+	Segment_G(1);
 	HAL_Delay(500);
-	Segment_E(0);
+	Segment_G(0);
+
+	Segment_P(1);
+	HAL_Delay(500);
+	Segment_P(0);
 }
 
 /* USER CODE END 4 */
