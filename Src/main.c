@@ -109,7 +109,6 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-		RingBuffer_DMA_Connect();
 		CipherGlot_init();
 
   /* USER CODE END 2 */
