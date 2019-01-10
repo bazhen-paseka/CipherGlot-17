@@ -18,9 +18,11 @@
 #include "usart.h"
 #include "gpio.h"
 
-#include <string.h>
-#include "cipherglot17_sm.h"
-#include <stdlib.h> // rand
+	#include <string.h>
+	#include <stdlib.h> // rand
+	#include "cipherglot17_sm.h"
+	#include "ringbuffer_dma_sm.h"
+
 //**********************************************************************
 
 RTC_TimeTypeDef TimeStruct  ;
@@ -107,7 +109,7 @@ void CipherGlot_init(void)
 
 	HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
 
-	sprintf(DataChar,"\r\n\r\nUART3 for debug Start\r\nSpeed 38400\r\n");
+	sprintf(DataChar,"\r\nCipherGlot-17\r\nUART1 for debug Start\r\nSpeed 38400\r\n");
 	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 
 	// Test_Segment();
@@ -235,6 +237,11 @@ void CipherGlot_main(void)
 				stop_minutes_u8 = TimeStruct.Minutes ;
 				stop_hours_u8   = TimeStruct.Hours ;
 				Cipher_Error(start_cipher_number_u32, current_cipher_number_u32, total_cipher_number_u32, stop_hours_u8, stop_minutes_u8, stop_second_u8 );
+
+				char http_req[200];
+				sprintf(http_req, "&field8=%d\r\n\r\n", (int)total_cipher_number_u32 );
+				RingBuffer_DMA_Main(http_req);
+
 				total_cipher_number_u32 = start_cipher_number_u32;
 			}
 		}
