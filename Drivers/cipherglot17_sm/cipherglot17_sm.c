@@ -103,12 +103,12 @@ void CipherGlot_init(void)
 	MX_TIM2_Init();
 	MX_TIM3_Init();
 	MX_TIM4_Init();
-	MX_USART3_UART_Init();
+	MX_USART1_UART_Init();
 
 	HAL_TIM_Base_Start_IT(&htim3); // start TIM3 interupt
 
 	sprintf(DataChar,"\r\n\r\nUART3 for debug Start\r\nSpeed 38400\r\n");
-	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 
 	// Test_Segment();
 	game_type_u8 = TestLED();
@@ -136,7 +136,7 @@ void CipherGlot_init(void)
 	current_cipher_number_u32 = start_cipher_number_u32 ;
 
 	sprintf(DataChar,"Init - Ok\r\n");
-	HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 	HAL_TIM_Base_Start_IT(&htim4); // start TIM4 prompt
 }
 //**********************************************************************
@@ -718,7 +718,7 @@ uint8_t ScanKeyBoard(void)
 		if (Prompt_Status() == 1 )
 		{
 			sprintf(DataChar,"prompt: %d\r\n", (int)cipher_arr_u8[current_cipher_number_u32]);
-			HAL_UART_Transmit(&huart3, (uint8_t *)DataChar, strlen(DataChar), 100);
+			HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 			CipherPrint(cipher_arr_u8[current_cipher_number_u32]);
 			HAL_Delay(200);
 			CipherPrint(0x11);
@@ -736,29 +736,29 @@ uint8_t ScanKeyBoard(void)
 
 		ScanRow_123A(1);
 		if (GPIOB->IDR & GPIO_IDR_IDR5) keyboard_u8 =0x01;
-		if (GPIOB->IDR & GPIO_IDR_IDR6) keyboard_u8 =0x02;
-		if (GPIOB->IDR & GPIO_IDR_IDR7) keyboard_u8 =0x03;
+		if (GPIOB->IDR & GPIO_IDR_IDR3) keyboard_u8 =0x02;
+		if (GPIOB->IDR & GPIO_IDR_IDR4) keyboard_u8 =0x03;
 		if (GPIOB->IDR & GPIO_IDR_IDR8) keyboard_u8 =0x0A;
 		ScanRow_123A(0);
 
 		ScanRow_456B(1);
 		if (GPIOB->IDR & GPIO_IDR_IDR5) keyboard_u8 =0x04;
-		if (GPIOB->IDR & GPIO_IDR_IDR6) keyboard_u8 =0x05;
-		if (GPIOB->IDR & GPIO_IDR_IDR7) keyboard_u8 =0x06;
+		if (GPIOB->IDR & GPIO_IDR_IDR3) keyboard_u8 =0x05;
+		if (GPIOB->IDR & GPIO_IDR_IDR4) keyboard_u8 =0x06;
 		if (GPIOB->IDR & GPIO_IDR_IDR8) keyboard_u8 =0x0B;
 		ScanRow_456B(0);
 
 		ScanRow_789C(1);
 		if (GPIOB->IDR & GPIO_IDR_IDR5) keyboard_u8 =0x07;
-		if (GPIOB->IDR & GPIO_IDR_IDR6) keyboard_u8 =0x08;
-		if (GPIOB->IDR & GPIO_IDR_IDR7) keyboard_u8 =0x09;
+		if (GPIOB->IDR & GPIO_IDR_IDR3) keyboard_u8 =0x08;
+		if (GPIOB->IDR & GPIO_IDR_IDR4) keyboard_u8 =0x09;
 		if (GPIOB->IDR & GPIO_IDR_IDR8) keyboard_u8 =0x0C;
 		ScanRow_789C(0);
 
 		ScanRow_E0FD(1);
 		if (GPIOB->IDR & GPIO_IDR_IDR5) keyboard_u8 =0x0E;
-		if (GPIOB->IDR & GPIO_IDR_IDR6) keyboard_u8 =0x00;
-		if (GPIOB->IDR & GPIO_IDR_IDR7) keyboard_u8 =0x0F;
+		if (GPIOB->IDR & GPIO_IDR_IDR3) keyboard_u8 =0x00;
+		if (GPIOB->IDR & GPIO_IDR_IDR4) keyboard_u8 =0x0F;
 		if (GPIOB->IDR & GPIO_IDR_IDR8) keyboard_u8 =0x0D;
 		ScanRow_E0FD(0);
 		}

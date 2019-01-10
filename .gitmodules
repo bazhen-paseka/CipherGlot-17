@@ -1,0 +1,3 @@
+[submodule "Drivers/ringbuffer_dma_sm"]
+	path = Drivers/ringbuffer_dma_sm
+	url = https://github.com/bazhen-paseka/ringbuffer_dma_sm.git
