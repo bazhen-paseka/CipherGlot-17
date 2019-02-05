@@ -1,0 +1,6 @@
+[submodule "Drivers/ringbuffer_dma_sm"]
+	path = Drivers/ringbuffer_dma_sm
+	url = https://github.com/bazhen-paseka/ringbuffer_dma_sm.git
+[submodule "Drivers/cipherglot17_sm"]
+	path = Drivers/cipherglot17_sm
+	url = https://github.com/bazhen-paseka/cipherglot17_sm.git
