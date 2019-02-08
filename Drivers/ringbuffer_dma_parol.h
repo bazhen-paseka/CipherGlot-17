@@ -7,11 +7,11 @@
 
 //	#define WIFI_SSID			"Kitchen"
 //	#define WIFI_PASS			"Papanina36"
-//
-//	#define WIFI_SSID			"Tapac"
-//	#define WIFI_PASS			"27051329"
 
-	#define WIFI_SSID			"Redmi"
-	#define WIFI_PASS			"16251117"
+	#define WIFI_SSID			"Tapac"
+	#define WIFI_PASS			"27051329"
+
+//	#define WIFI_SSID			"Redmi"
+//	#define WIFI_PASS			"16251117"
 
 #endif

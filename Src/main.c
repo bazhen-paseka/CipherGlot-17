@@ -109,7 +109,7 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-		CipherGlot_init();
+  	  CipherGlot_init();
 
   /* USER CODE END 2 */
 
@@ -118,6 +118,7 @@ int main(void)
   while (1)
   {
 	  CipherGlot_main();
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
