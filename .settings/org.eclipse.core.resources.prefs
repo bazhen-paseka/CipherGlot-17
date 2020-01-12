@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
 encoding//Drivers/cipherglot17_sm/cipherglot17_sm.c=UTF-8
 encoding//Drivers/cipherglot17_sm/cipherglot17_sm.h=UTF-8
+encoding//Drivers/flash_stm32f103_hal_sm/flash_stm32f103_hal_sm.c=UTF-8
 encoding//Src/main.c=UTF-8
