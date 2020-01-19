@@ -53,8 +53,8 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_SEGMENT_B_Pin|LED_SEGMENT_D_Pin|LED_SEGMENT_E_Pin|LED_SEGMENT_A_Pin 
-                          |GPIO_PIN_5|LED_SEGMENT_F_Pin|LED_SEGMENT_G_Pin|GPIO_PIN_8 
-                          |GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11, GPIO_PIN_RESET);
+                          |GPIO_PIN_5|LED_SEGMENT_F_Pin|LED_SEGMENT_G_Pin|KEYBOARD_ROW_123A_Pin 
+                          |KEYBOARD_ROW_456B_Pin|KEYBOARD_ROW_789C_Pin|KEYBOARD_ROW_E0FD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PCPin PCPin */
   GPIO_InitStruct.Pin = LED_SEGMENT_P_Pin|LED_SEGMENT_C_Pin;
@@ -64,18 +64,18 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin 
-                           PA5 PAPin PAPin PA8 
-                           PA9 PA10 PA11 */
+                           PA5 PAPin PAPin PAPin 
+                           PAPin PAPin PAPin */
   GPIO_InitStruct.Pin = LED_SEGMENT_B_Pin|LED_SEGMENT_D_Pin|LED_SEGMENT_E_Pin|LED_SEGMENT_A_Pin 
-                          |GPIO_PIN_5|LED_SEGMENT_F_Pin|LED_SEGMENT_G_Pin|GPIO_PIN_8 
-                          |GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11;
+                          |GPIO_PIN_5|LED_SEGMENT_F_Pin|LED_SEGMENT_G_Pin|KEYBOARD_ROW_123A_Pin 
+                          |KEYBOARD_ROW_456B_Pin|KEYBOARD_ROW_789C_Pin|KEYBOARD_ROW_E0FD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB3 PB4 PB5 PB8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_8;
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = KEYBOARD_COLUMN_2_Pin|KEYBOARD_COLUMN_3_Pin|KEYBOARD_COLUMN_1_Pin|KEYBOARD_COLUMN_A_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
